@@ -20,9 +20,16 @@ async function startWhatsApp() {
     await useMultiFileAuthState("./auth_info");
 
   sock = makeWASocket({
-    auth: state,
-    logger: pino({ level: "silent" })
-  });
+  auth: state,
+  logger: pino({ level: "info" }),
+  printQRInTerminal: false
+});
+
+console.log("Baileys socket created");
+
+sock.ev.on("connection.update", (update) => {
+  console.log("WhatsApp connection update:", update);
+});
 
   sock.ev.on("creds.update", saveCreds);
 
