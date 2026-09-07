@@ -112,9 +112,13 @@ app.post("/api/pairing", async (req, res) => {
 app.listen(PORT, async () => {
   console.log(`DevArth-Bot Backend running on port ${PORT}`);
 
+  console.log("Starting WhatsApp/Baileys...");
+
   try {
     await startWhatsApp();
+    console.log("WhatsApp start function executed");
   } catch (error) {
-    console.error("WhatsApp startup error:", error.message);
+    console.error("WhatsApp startup error:", error);
+    console.error(error.stack);
   }
 });
