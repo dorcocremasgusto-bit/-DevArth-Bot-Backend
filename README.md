@@ -1,2 +1,0 @@
-# -DevArth-Bot-Backend
-Backend
