@@ -1,106 +1,131 @@
-// ==========================================
-// CONFIGURATION API
-// ==========================================
-// Colles ton API Key ici entre les guillemets ""
-const API_KEY = "F79c2a9bbf29054b7e585ca1df7b7f096fee81bcWcvmI79eJaGHYityXbCpA2ClU"; 
-// ==========================================
-
+// --- VARIABLES GLOBALES ---
 let isRunning = false;
+let timerInterval = null;
+let floodInterval = null;
 
-function startFlood() {
+// Fonction principale déclenchée par le bouton HTML
+async function startFlood() {
     const input = document.getElementById('phoneNumber');
+    const btn = document.getElementById('startBtn');
     const statusText = document.getElementById('statusText');
     const countDisplay = document.getElementById('countDisplay');
     const timeDisplay = document.getElementById('timeDisplay');
     const logConsole = document.getElementById('logConsole');
-    const btn = document.getElementById('startBtn');
 
+    // 1. Validation
     if (!input.value || isRunning) return;
 
-    // Reset
+    const targetNumber = input.value.replace(/\D/g, ''); // Nettoie le numéro
+    
+    // 2. Initialisation UI
     isRunning = true;
-    let sentCount = 0;
-    let totalTime = 180; // 3 minutes en secondes
-    let currentSecond = totalTime;
-    
     btn.disabled = true;
-    btn.innerText = "BANNING IN PROGRESS...";
-    statusText.innerText = "ATTACKING";
-    statusText.style.color = "#ff003c";
-    
-    addLog(`Targeting ${input.value}...`, 'normal');
-    addLog("Connecting to WhatsApp Gateway...", 'normal');
+    btn.innerText = "CONNEXION AU SERVEUR...";
+    addLog(`[INIT] Connexion au serveur Klaus pour ${targetNumber}...`, "normal");
 
-    // Timer Loop
-    const timerInterval = setInterval(() => {
-        currentSecond--;
+    try {
+        // 3. Appel API vers le backend Node.js
+        const response = await fetch('/api/flood', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phoneNumber: targetNumber })
+        });
+
+        const data = await response.json();
+
+        // 4. Gestion du succès ou échec
+        if (data.success) {
+            addLog(`[SUCCESS] Le serveur a envoyé ${data.totalSent} messages !`, "success");
+            statusText.innerText = "COMPLETED";
+            statusText.style.color = "#27c93f";
+            btn.innerText = "BANNING TERMINÉ";
+        } else {
+            addLog(`[ERROR] ${data.error || 'Erreur serveur inconnue'}`, "error");
+            statusText.innerText = "FAILED";
+            statusText.style.color = "red";
+            btn.innerText = "RÉESSAYER";
+        }
+    } catch (err) {
+        addLog("[!] Erreur de connexion réseau ou serveur hors ligne.", "error");
+        console.error(err);
+        statusText.innerText = "OFFLINE";
+        btn.innerText = "RÉESSAYER";
+    } finally {
+        // 5. Nettoyage des compteurs visuels
+        clearInterval(timerInterval);
+        clearInterval(floodInterval);
+        isRunning = false;
+        
+        // On ne réactive pas le bouton si c'était un succès critique, 
+        // mais on laisse l'utilisateur recommencer.
+        if(btn.innerText === "CONNEXION AU SERVEUR...") {
+             btn.innerText = "INITIATE BANNING SEQUENCE";
+        }
+        
+        // Reset des compteurs après un délai
+        setTimeout(() => {
+            countDisplay.innerText = "0 / 300";
+            timeDisplay.innerText = "03:00";
+            statusText.style.color = ""; // Reset couleur
+        }, 2000);
+    }
+}
+
+// Fonction pour gérer l'animation visuelle (compte à rebours)
+function startVisualCountdown(totalTimeSeconds = 180) {
+    let currentTime = totalTimeSeconds;
+    const timeDisplay = document.getElementById('timeDisplay');
+    const countDisplay = document.getElementById('countDisplay');
+    const statusText = document.getElementById('statusText');
+
+    statusText.innerText = "ATTACKING...";
+    statusText.style.color = "#ff003c";
+
+    // Compte à rebours temps réel
+    timerInterval = setInterval(() => {
+        currentTime--;
         
         // Format MM:SS
-        let m = Math.floor(currentSecond / 60);
-        let s = currentSecond % 60;
+        let m = Math.floor(currentTime / 60);
+        let s = currentTime % 60;
         timeDisplay.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
 
-        if (currentSecond <= 0) {
+        if (currentTime <= 0) {
             clearInterval(timerInterval);
-            stopFlood(input.value, sentCount);
         }
     }, 1000);
 
-    // Flood Logic: 300 links over 180 seconds = 1 link every 0.6 seconds
-    const floodInterval = setInterval(() => {
-        if (sentCount >= 300) {
-            clearInterval(floodInterval);
-            clearInterval(timerInterval);
-            stopFlood(input.value, sentCount);
-            return;
+    // Animation d'envoi (pour faire beau à voir, même si le vrai envoi est côté serveur)
+    floodInterval = setInterval(() => {
+        // On simule une progression visuelle jusqu'à 300
+        // Note: Ceci est juste cosmétique, le vrai travail est fait par Node.js
+        let currentSent = parseInt(countDisplay.innerText.split('/')[0]) || 0;
+        if (currentSent < 300) {
+            countDisplay.innerText = `${currentSent + 1} / 300`;
+            
+            // Petit effet visuel aléatoire
+            document.body.style.boxShadow = `inset 0 0 ${Math.random() * 50}px var(--neon-red)`;
+            setTimeout(() => document.body.style.boxShadow = 'none', 100);
         }
-
-        sentCount++;
-        countDisplay.innerText = `${sentCount} / 300`;
-        
-        // --- ZONE API ICI ---
-        // Pour utiliser une vraie API, remplace le code ci-dessous par un fetch()
-        // Exemple :
-        /*
-        fetch(`https://ton-api.com/send?number=${input.value}&key=${API_KEY}`, { method: 'POST' })
-          .then(response => response.json())
-          .then(data => { console.log(data); });
-        */
-        
-        // Simulation actuelle (pour l'effet visuel) :
-        const randomCode = Math.random().toString(36).substring(7);
-        const fakeLink = `https://wa.me/${input.value.replace(/\D/g,'')}?text=Ban_Link_${randomCode}`;
-        addLog(`[+] Link Sent: ${fakeLink}`, 'normal');
-        
-        // Animation visuelle aléatoire sur le bouton ou l'écran
-        document.body.style.boxShadow = `inset 0 0 ${Math.random() * 50}px var(--neon-red)`;
-        setTimeout(() => document.body.style.boxShadow = 'none', 100);
-
-    }, 600); // 600ms * 300 = 180 000 ms = 3 minutes exactement.
+    }, 600); // Simule un envoi toutes les 600ms
 }
 
-function stopFlood(target, totalSent) {
-    isRunning = false;
-    const statusText = document.getElementById('statusText');
-    const btn = document.getElementById('startBtn");
-    
-    statusText.innerText = "COMPLETED";
-    statusText.style.color = "#27c93f";
-    btn.disabled = false;
-    btn.innerText = "INITIATE BANNING SEQUENCE";
-    
-    addLog(`--------------------------------`, 'normal');
-    addLog(`[SUCCESS] Target ${target} flooded with ${totalSent} links.`, 'success');
-    addLog("System Idle.", 'normal');
-}
-
+// Fonction utilitaire pour les logs
 function addLog(message, type) {
     const consoleDiv = document.getElementById('logConsole');
     const line = document.createElement('div');
     line.innerText = message;
+    
     if (type === 'error') line.classList.add('error');
     if (type === 'success') line.classList.add('success');
     
     consoleDiv.appendChild(line);
-    consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto scroll
+    // Auto-scroll vers le bas
+    consoleDiv.scrollTop = consoleDiv.scrollHeight;
 }
+
+// Démarrage automatique de l'animation visuelle quand on clique
+// (Modification légère du HTML onclick pour appeler cette fonction avant startFlood)
+document.getElementById('startBtn').addEventListener('click', () => {
+    startVisualCountdown(180); // Lance le chrono visuel
+});
