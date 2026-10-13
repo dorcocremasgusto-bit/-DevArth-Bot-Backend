@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLAUS BAN V3</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="crt-overlay"></div>
+    
+    <div class="container">
+        <header>
+            <h1 class="glitch" data-text="KLAUS BAN V3">KLAUS BAN V3</h1>
+            <p class="subtitle">WHATSAPP MASS FLOOD BANNING SYSTEM</p>
+        </header>
+
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span>root@klaus-dev:~</span>
+            </div>
+            
+            <div class="input-group">
+                <label for="phoneNumber">TARGET NUMBER (E.g. 33612345678)</label>
+                <input type="text" id="phoneNumber" placeholder="+1 234 567 8900" autocomplete="off">
+            </div>
+
+            <button id="startBtn" onclick="startFlood()">INITIATE BANNING SEQUENCE</button>
+
+            <div class="status-panel">
+                <div class="stat-box">
+                    <span>STATUS:</span>
+                    <span id="statusText">IDLE</span>
+                </div>
+                <div class="stat-box">
+                    <span>SENT:</span>
+                    <span id="countDisplay">0 / 300</span>
+                </div>
+                <div class="stat-box">
+                    <span>TIME REMAINING:</span>
+                    <span id="timeDisplay">03:00</span>
+                </div>
+            </div>
+
+            <div class="log-console" id="logConsole">
+                <div>> System ready.</div>
+                <div>> Waiting for target...</div>
+            </div>
+        </div>
+
+        <footer>
+            Create By Klaus Dev
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
