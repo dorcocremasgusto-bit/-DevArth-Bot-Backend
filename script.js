@@ -1,6 +1,6 @@
 let isRunning = false;
 
-function startFlood() {
+async function launchBan() {
     const input = document.getElementById('phoneNumber');
     const statusText = document.getElementById('statusText');
     const countDisplay = document.getElementById('countDisplay');
@@ -8,12 +8,16 @@ function startFlood() {
     const logConsole = document.getElementById('logConsole');
     const btn = document.getElementById('startBtn');
 
-    if (!input.value || isRunning) return;
+    let phone = input.value.replace(/[^0-9]/g, ''); // Nettoyage du numéro
+    if (!phone) {
+        addLog("Error: Target number required.", 'error');
+        return;
+    }
 
-    // Reset
+    // Reset UI
     isRunning = true;
     let sentCount = 0;
-    let totalTime = 180; // 3 minutes en secondes
+    let totalTime = 180; 
     let currentSecond = totalTime;
     
     btn.disabled = true;
@@ -21,51 +25,59 @@ function startFlood() {
     statusText.innerText = "ATTACKING";
     statusText.style.color = "#ff003c";
     
-    addLog(`Targeting ${input.value}...`, 'normal');
-    addLog("Connecting to WhatsApp Gateway...", 'normal');
+    addLog(`Fetching 300 unique links for ${phone}...`, 'normal');
 
-    // Timer Loop
-    const timerInterval = setInterval(() => {
-        currentSecond--;
+    try {
+        // 1. Récupérer les liens depuis notre Node.js
+        const response = await fetch(`/api/generate?phone=${phone}`);
+        const data = await response.json();
         
-        // Format MM:SS
-        let m = Math.floor(currentSecond / 60);
-        let s = currentSecond % 60;
-        timeDisplay.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        if (!data.links || data.links.length === 0) throw new Error("No links generated");
 
-        if (currentSecond <= 0) {
-            clearInterval(timerInterval);
-            stopFlood(input.value, sentCount);
+        addLog("Links acquired. Initiating Flood...", 'success');
+
+        // 2. Lancer le timer visuel
+        const timerInterval = setInterval(() => {
+            currentSecond--;
+            let m = Math.floor(currentSecond / 60);
+            let s = currentSecond % 60;
+            timeDisplay.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+
+            if (currentSecond <= 0) {
+                clearInterval(timerInterval);
+                finishBan();
+            }
+        }, 1000);
+
+        // 3. Ouvrir les fenêtres (Flood)
+        // On ouvre 300 fenêtres. Pour éviter que le navigateur bloque tout, on fait des batches.
+        for (let i = 0; i < data.links.length; i++) {
+            const link = data.links[i];
+            
+            // Ouverture d'une petite fenêtre pop-up
+            window.open(link, '_blank', 'width=400,height=600');
+            
+            sentCount++;
+            countDisplay.innerText = `${sentCount} / 300`;
+            addLog(`[+] Link ${i+1} Opened: ${link}`, 'normal');
+            
+            // Délai pour laisser le temps à l'OS de gérer les fenêtres
+            await new Promise(r => setTimeout(r, 600)); 
         }
-    }, 1000);
 
-    // Flood Logic: 300 links over 180 seconds
-    const floodInterval = setInterval(() => {
-        if (sentCount >= 300) {
-            clearInterval(floodInterval);
-            clearInterval(timerInterval);
-            stopFlood(input.value, sentCount);
-            return;
-        }
+        clearInterval(timerInterval);
+        finishBan();
 
-        sentCount++;
-        countDisplay.innerText = `${sentCount} / 300`;
-        
-        // Générer un lien unique pour chaque flood (simulation)
-        const randomCode = Math.random().toString(36).substring(7);
-        const fakeLink = `https://wa.me/${input.value.replace(/\D/g,'')}?text=Ban_Link_${randomCode}`;
-        
-        addLog(`[+] Link Sent: ${fakeLink}`, 'normal');
-        
-        // Animation visuelle aléatoire sur le bouton ou l'écran
-        document.body.style.boxShadow = `inset 0 0 ${Math.random() * 50}px var(--neon-red)`;
-        setTimeout(() => document.body.style.boxShadow = 'none', 100);
-
-    }, 600); // 600ms * 300 = 180 000 ms = 3 minutes exactement.
+    } catch (err) {
+        addLog(`Critical Error: ${err.message}`, 'error');
+        statusText.innerText = "FAILED";
+        statusText.style.color = "red";
+        btn.disabled = false;
+        btn.innerText = "RETRY";
+    }
 }
 
-function stopFlood(target, totalSent) {
-    isRunning = false;
+function finishBan() {
     const statusText = document.getElementById('statusText');
     const btn = document.getElementById('startBtn');
     
@@ -75,8 +87,7 @@ function stopFlood(target, totalSent) {
     btn.innerText = "INITIATE BANNING SEQUENCE";
     
     addLog(`--------------------------------`, 'normal');
-    addLog(`[SUCCESS] Target ${target} flooded with ${totalSent} links.`, 'success');
-    addLog("System Idle.", 'normal');
+    addLog("[SUCCESS] Flood sequence completed. Check your windows!", 'success');
 }
 
 function addLog(message, type) {
@@ -85,7 +96,6 @@ function addLog(message, type) {
     line.innerText = message;
     if (type === 'error') line.classList.add('error');
     if (type === 'success') line.classList.add('success');
-    
     consoleDiv.appendChild(line);
-    consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto scroll
+    consoleDiv.scrollTop = consoleDiv.scrollHeight;
 }
